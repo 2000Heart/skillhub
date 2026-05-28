@@ -12,5 +12,17 @@ public record PlatformPrincipal(
     String email,
     String avatarUrl,
     String oauthProvider,
-    Set<String> platformRoles
-) implements Serializable {}
+    Set<String> platformRoles,
+    String department
+) implements Serializable {
+
+    public PlatformPrincipal(
+            String userId,
+            String displayName,
+            String email,
+            String avatarUrl,
+            String oauthProvider,
+            Set<String> platformRoles) {
+        this(userId, displayName, email, avatarUrl, oauthProvider, platformRoles, null);
+    }
+}

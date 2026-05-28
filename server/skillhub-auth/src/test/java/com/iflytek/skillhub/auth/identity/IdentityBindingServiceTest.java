@@ -16,7 +16,10 @@ import com.iflytek.skillhub.auth.oauth.AccountPendingException;
 import com.iflytek.skillhub.auth.rbac.PlatformPrincipal;
 import com.iflytek.skillhub.auth.repository.IdentityBindingRepository;
 import com.iflytek.skillhub.auth.repository.UserRoleBindingRepository;
+import com.iflytek.skillhub.auth.dingtalk.DingTalkClaimsMapper;
 import com.iflytek.skillhub.domain.namespace.GlobalNamespaceMembershipService;
+import com.iflytek.skillhub.domain.orgsync.OrgUserProfile;
+import com.iflytek.skillhub.domain.orgsync.OrgUserProfileRepository;
 import com.iflytek.skillhub.domain.user.UserAccount;
 import com.iflytek.skillhub.domain.user.UserAccountRepository;
 import com.iflytek.skillhub.domain.user.UserStatus;
@@ -46,11 +49,20 @@ class IdentityBindingServiceTest {
     @Mock
     private GlobalNamespaceMembershipService globalNamespaceMembershipService;
 
+    @Mock
+    private OrgUserProfileRepository orgUserProfileRepository;
+
     private IdentityBindingService service;
 
     @BeforeEach
     void setUp() {
-        service = new IdentityBindingService(bindingRepo, userRepo, roleBindingRepo, globalNamespaceMembershipService);
+        service = new IdentityBindingService(
+                bindingRepo,
+                userRepo,
+                roleBindingRepo,
+                globalNamespaceMembershipService,
+                orgUserProfileRepository
+        );
     }
 
     @Test
@@ -157,6 +169,39 @@ class IdentityBindingServiceTest {
         PlatformPrincipal principal = service.bindOrCreate(claims, UserStatus.ACTIVE);
 
         assertThat(principal.platformRoles()).containsExactly("AUDITOR");
+    }
+
+    @Test
+    void bindOrCreate_dingtalkLinksExistingOrgUserByUnionId() {
+        OAuthClaims claims = new OAuthClaims(
+                DingTalkClaimsMapper.PROVIDER_CODE,
+                "union-1",
+                null,
+                false,
+                "张鸿",
+                Map.of("department", "研发")
+        );
+        OrgUserProfile orgProfile = new OrgUserProfile("4350194725795423", "union-1", "张鸿");
+        UserAccount syncedUser = new UserAccount("4350194725795423", "张鸿", null, null, "研发");
+
+        when(bindingRepo.findByProviderCodeAndSubject(DingTalkClaimsMapper.PROVIDER_CODE, "union-1"))
+                .thenReturn(Optional.empty());
+        when(orgUserProfileRepository.findByUnionId("union-1")).thenReturn(Optional.of(orgProfile));
+        when(userRepo.findById("4350194725795423")).thenReturn(Optional.of(syncedUser));
+        when(userRepo.save(any(UserAccount.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Role role = new Role();
+        ReflectionTestUtils.setField(role, "code", "SUPER_ADMIN");
+        when(roleBindingRepo.findByUserId("4350194725795423"))
+                .thenReturn(List.of(new UserRoleBinding("4350194725795423", role)));
+
+        PlatformPrincipal principal = service.bindOrCreate(claims, UserStatus.ACTIVE);
+
+        ArgumentCaptor<UserAccount> userCaptor = ArgumentCaptor.forClass(UserAccount.class);
+        verify(userRepo).save(userCaptor.capture());
+        assertThat(userCaptor.getValue().getId()).isEqualTo("4350194725795423");
+        assertThat(principal.userId()).isEqualTo("4350194725795423");
+        assertThat(principal.platformRoles()).containsExactly("SUPER_ADMIN");
     }
 
     @Test
