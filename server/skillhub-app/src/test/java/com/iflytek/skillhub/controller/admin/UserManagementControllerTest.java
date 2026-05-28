@@ -78,6 +78,7 @@ class UserManagementControllerTest {
                                 "user-1",
                                 "alice",
                                 "alice@example.com",
+                                "研发部",
                                 "ACTIVE",
                                 List.of("AUDITOR"),
                                 Instant.parse("2026-03-13T09:00:00Z"))),

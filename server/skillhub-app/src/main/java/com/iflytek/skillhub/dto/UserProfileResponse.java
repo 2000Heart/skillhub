@@ -18,6 +18,7 @@ public record UserProfileResponse(
         String displayName,
         String avatarUrl,
         String email,
+        String department,
         PendingChangesResponse pendingChanges,
         Map<String, FieldPolicyResponse> fieldPolicies
 ) {}

@@ -100,15 +100,17 @@ public class AuthController extends BaseApiController {
         boolean rolesChanged = !freshRoles.equals(principal.platformRoles());
         boolean displayNameChanged = !user.getDisplayName().equals(principal.displayName());
         boolean avatarChanged = !java.util.Objects.equals(user.getAvatarUrl(), principal.avatarUrl());
+        boolean departmentChanged = !java.util.Objects.equals(user.getDepartment(), principal.department());
 
-        if (rolesChanged || displayNameChanged || avatarChanged) {
+        if (rolesChanged || displayNameChanged || avatarChanged || departmentChanged) {
             principal = new PlatformPrincipal(
                     principal.userId(),
                     user.getDisplayName(),    // use DB value (may have been updated via profile)
                     principal.email(),
                     user.getAvatarUrl(),      // use DB value
                     principal.oauthProvider(),
-                    freshRoles);
+                    freshRoles,
+                    user.getDepartment());
             platformSessionService.establishSession(principal, request, false);
         }
         return ok("response.success.read", AuthMeResponse.from(principal));

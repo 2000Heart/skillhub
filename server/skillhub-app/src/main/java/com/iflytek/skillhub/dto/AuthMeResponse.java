@@ -10,7 +10,8 @@ public record AuthMeResponse(
         String email,
         String avatarUrl,
         String oauthProvider,
-        Set<String> platformRoles
+        Set<String> platformRoles,
+        String department
 ) {
     public static AuthMeResponse from(PlatformPrincipal principal) {
         return new AuthMeResponse(
@@ -19,7 +20,8 @@ public record AuthMeResponse(
                 principal.email() != null ? principal.email() : "",
                 principal.avatarUrl() != null ? principal.avatarUrl() : "",
                 principal.oauthProvider(),
-                principal.platformRoles()
+                principal.platformRoles(),
+                principal.department()
         );
     }
 }

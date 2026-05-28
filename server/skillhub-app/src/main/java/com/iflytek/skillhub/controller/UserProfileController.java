@@ -103,6 +103,7 @@ public class UserProfileController extends BaseApiController {
                 displayName,
                 avatarUrl,
                 user.getEmail(),
+                user.getDepartment(),
                 pendingChanges,
                 fieldPolicies
         );
@@ -194,7 +195,8 @@ public class UserProfileController extends BaseApiController {
                 principal.email(),
                 newAvatarUrl,
                 principal.oauthProvider(),
-                principal.platformRoles()
+                principal.platformRoles(),
+                principal.department()
         );
         platformSessionService.attachToAuthenticatedSession(
                 updatedPrincipal, authentication, request, false);

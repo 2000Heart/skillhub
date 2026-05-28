@@ -9,6 +9,7 @@ import com.iflytek.skillhub.auth.direct.DirectAuthRequest;
 import com.iflytek.skillhub.auth.rbac.PlatformPrincipal;
 import com.iflytek.skillhub.config.AuthSessionBootstrapProperties;
 import com.iflytek.skillhub.config.DirectAuthProperties;
+import com.iflytek.skillhub.config.DingTalkProperties;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ class AuthMethodCatalogTest {
         directAuthProperties.setEnabled(true);
         AuthSessionBootstrapProperties bootstrapProperties = new AuthSessionBootstrapProperties();
         bootstrapProperties.setEnabled(true);
+        DingTalkProperties dingTalkProperties = new DingTalkProperties();
 
         DirectAuthProvider directProvider = new DirectAuthProvider() {
             @Override
@@ -62,6 +64,7 @@ class AuthMethodCatalogTest {
             oauthProperties,
             directAuthProperties,
             bootstrapProperties,
+            dingTalkProperties,
             List.of(directProvider),
             List.of(bootstrapProvider)
         );
@@ -82,6 +85,7 @@ class AuthMethodCatalogTest {
         directAuthProperties.setEnabled(true);
         AuthSessionBootstrapProperties bootstrapProperties = new AuthSessionBootstrapProperties();
         bootstrapProperties.setEnabled(true);
+        DingTalkProperties dingTalkProperties = new DingTalkProperties();
 
         DirectAuthProvider directProvider = new DirectAuthProvider() {
             @Override
@@ -111,6 +115,7 @@ class AuthMethodCatalogTest {
             oauthProperties,
             directAuthProperties,
             bootstrapProperties,
+            dingTalkProperties,
             List.of(directProvider),
             List.of(bootstrapProvider)
         );

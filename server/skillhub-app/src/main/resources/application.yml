@@ -193,6 +193,16 @@ skillhub:
       reclaim-min-idle: ${SKILLHUB_SCAN_STREAM_RECLAIM_MIN_IDLE:PT2M}
       reclaim-batch-size: ${SKILLHUB_SCAN_STREAM_RECLAIM_BATCH_SIZE:20}
       reclaim-interval: ${SKILLHUB_SCAN_STREAM_RECLAIM_INTERVAL:PT30S}
+  dingtalk:
+    enabled: ${SKILLHUB_DINGTALK_ENABLED:false}
+    client-id: ${SKILLHUB_DINGTALK_CLIENT_ID:}
+    client-secret: ${SKILLHUB_DINGTALK_CLIENT_SECRET:}
+    default-corp-id: ${SKILLHUB_DINGTALK_DEFAULT_CORP_ID:}
+    super-admin-union-ids: ${SKILLHUB_DINGTALK_SUPER_ADMIN_UNION_IDS:}
+    auto-super-admin-for-managers: ${SKILLHUB_DINGTALK_AUTO_SUPER_ADMIN_FOR_MANAGERS:false}
+    org-sync:
+      startup-enabled: ${SKILLHUB_DINGTALK_ORG_SYNC_STARTUP_ENABLED:true}
+      full-cron: ${SKILLHUB_DINGTALK_ORG_SYNC_FULL_CRON:0 30 2 * * ?}
   bootstrap:
     admin:
       enabled: ${BOOTSTRAP_ADMIN_ENABLED:false}

@@ -70,6 +70,7 @@ public class AdminUserAppService {
                         user.getId(),
                         user.getDisplayName(),
                         user.getEmail(),
+                        user.getDepartment(),
                         user.getStatus().name(),
                         rolesByUserId.getOrDefault(user.getId(), List.of()),
                         user.getCreatedAt()))
