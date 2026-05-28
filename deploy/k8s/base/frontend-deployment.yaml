@@ -21,6 +21,31 @@ spec:
           env:
             - name: SKILLHUB_API_UPSTREAM
               value: http://skillhub-server:8080
+            - name: SKILLHUB_PUBLIC_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: skillhub-config
+                  key: skillhub-public-base-url
+            - name: SKILLHUB_WEB_AUTH_MODE
+              valueFrom:
+                configMapKeyRef:
+                  name: skillhub-config
+                  key: skillhub-web-auth-mode
+            - name: SKILLHUB_WEB_DINGTALK_AUTH_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: skillhub-config
+                  key: skillhub-web-dingtalk-auth-enabled
+            - name: SKILLHUB_WEB_DINGTALK_AUTO_LOGIN
+              valueFrom:
+                configMapKeyRef:
+                  name: skillhub-config
+                  key: skillhub-web-dingtalk-auto-login
+            - name: SKILLHUB_WEB_DINGTALK_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: skillhub-config
+                  key: skillhub-dingtalk-client-id
           ports:
             - containerPort: 80
               name: http

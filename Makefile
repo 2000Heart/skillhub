@@ -6,7 +6,8 @@ DEV_WEB_PID := $(DEV_DIR)/web.pid
 DEV_SERVER_LOG := $(DEV_DIR)/server.log
 DEV_WEB_LOG := $(DEV_DIR)/web.log
 DEV_WEB_URL := http://localhost:3000
-DEV_API_URL := http://localhost:8080
+DEV_API_PORT ?= 8080
+DEV_API_URL := http://localhost:$(DEV_API_PORT)
 DEV_SCANNER_URL := http://localhost:8000
 STAGING_API_URL := http://localhost:8080
 STAGING_WEB_URL := http://localhost
@@ -15,6 +16,8 @@ DEV_PROCESS := bash scripts/dev-process.sh
 DEV_SERVER_PREPARE := true
 DEV_SERVER_CMD := ./scripts/run-dev-app.sh
 DEV_SERVER_SCANNER_ENV := SKILLHUB_SECURITY_SCANNER_ENABLED=true SKILLHUB_SECURITY_SCANNER_URL=$(DEV_SCANNER_URL) SKILLHUB_SECURITY_SCANNER_MODE=upload
+# Optional: .dev/dingtalk.env (gitignored) exports DingTalk credentials for local dev.
+DEV_SERVER_START_SHELL := set -a; [ -f ../.dev/dingtalk.env ] && . ../.dev/dingtalk.env; set +a; $(DEV_SERVER_PREPARE) && exec env $(DEV_SERVER_SCANNER_ENV) $(DEV_SERVER_CMD)
 BACKEND_TEST_JAVA_OPTIONS ?= -XX:+EnableDynamicAgentLoading
 PARALLEL_BASE_REF ?= origin/main
 PARALLEL_WORKTREE_ROOT ?=
@@ -42,7 +45,7 @@ dev-all: ## 一键启动本地开发环境（依赖 + scanner + 后端 + 前端�
 		echo "Backend already running with PID $$(cat $(DEV_SERVER_PID))"; \
 	else \
 		echo "Starting backend..."; \
-		$(DEV_PROCESS) start --pid-file $(DEV_SERVER_PID) --log-file $(DEV_SERVER_LOG) --cwd server -- /bin/sh -lc '$(DEV_SERVER_PREPARE) && exec env $(DEV_SERVER_SCANNER_ENV) $(DEV_SERVER_CMD)' >/dev/null; \
+		$(DEV_PROCESS) start --pid-file $(DEV_SERVER_PID) --log-file $(DEV_SERVER_LOG) --cwd server -- /bin/sh -lc '$(DEV_SERVER_START_SHELL)' >/dev/null; \
 	fi
 	@if $(DEV_PROCESS) status --pid-file $(DEV_WEB_PID) >/dev/null 2>&1; then \
 		echo "Frontend already running with PID $$(cat $(DEV_WEB_PID))"; \
@@ -68,7 +71,7 @@ dev-all: ## 一键启动本地开发环境（依赖 + scanner + 后端 + 前端�
 			echo "Backend did not become ready on attempt $$attempt. Restarting..."; \
 			$(DEV_PROCESS) stop --pid-file $(DEV_SERVER_PID); \
 			sleep 2; \
-			$(DEV_PROCESS) start --pid-file $(DEV_SERVER_PID) --log-file $(DEV_SERVER_LOG) --cwd server -- /bin/sh -lc '$(DEV_SERVER_PREPARE) && exec env $(DEV_SERVER_SCANNER_ENV) $(DEV_SERVER_CMD)' >/dev/null; \
+			$(DEV_PROCESS) start --pid-file $(DEV_SERVER_PID) --log-file $(DEV_SERVER_LOG) --cwd server -- /bin/sh -lc '$(DEV_SERVER_START_SHELL)' >/dev/null; \
 		fi; \
 	done; \
 		if [ "$$backend_ready" -ne 1 ]; then \
@@ -126,22 +129,32 @@ dev-all: ## 一键启动本地开发环境（依赖 + scanner + 后端 + 前端�
 	@echo "  Frontend: $(DEV_WEB_LOG)"
 
 dev-server: ## 启动后端开发服务器
-	cd server && /bin/sh -lc '$(DEV_SERVER_PREPARE) && exec $(DEV_SERVER_CMD)'
+	cd server && /bin/sh -lc '$(DEV_SERVER_START_SHELL)'
 
 dev-server-restart: ## 重启后端开发服务器
 	@mkdir -p $(DEV_DIR)
 	@$(DEV_PROCESS) stop --pid-file $(DEV_SERVER_PID)
-	@$(DEV_PROCESS) start --pid-file $(DEV_SERVER_PID) --log-file $(DEV_SERVER_LOG) --cwd server -- /bin/sh -lc '$(DEV_SERVER_PREPARE) && exec env $(DEV_SERVER_SCANNER_ENV) $(DEV_SERVER_CMD)' >/dev/null
-	@echo "Waiting for backend on $(DEV_API_URL) ..."
-	@for i in $$(seq 1 30); do \
-		if curl -sf $(DEV_API_URL)/actuator/health >/dev/null; then \
-			echo "Backend ready."; \
+	@dev_api_port=8080; \
+	if [ -f .dev/dingtalk.env ]; then \
+		. ./.dev/dingtalk.env; \
+		dev_api_port="$${SERVER_PORT:-8080}"; \
+	fi; \
+	$(DEV_PROCESS) start --pid-file $(DEV_SERVER_PID) --log-file $(DEV_SERVER_LOG) --cwd server -- /bin/sh -lc '$(DEV_SERVER_START_SHELL)' >/dev/null; \
+	echo "Waiting for backend on http://localhost:$$dev_api_port ..."; \
+	for i in $$(seq 1 30); do \
+		if curl -sf "http://localhost:$$dev_api_port/actuator/health" >/dev/null; then \
+			echo "Backend ready on port $$dev_api_port."; \
 			exit 0; \
 		fi; \
 		sleep 2; \
 	done; \
 	echo "Backend failed to become ready. Check $(DEV_SERVER_LOG)"; \
 	exit 1
+
+dingtalk-smoke: ## 钉钉登录链路本地 smoke（需 dev-server-restart 已就绪）
+	@api_base=http://localhost:8080; \
+	if [ -f .dev/dingtalk.env ]; then . ./.dev/dingtalk.env; api_base="http://localhost:$${SERVER_PORT:-8080}"; fi; \
+	API_BASE="$$api_base" ./scripts/dingtalk-local-smoke.sh
 
 namespace-smoke: ## 运行命名空间工作流 smoke test
 	./scripts/namespace-smoke-test.sh $(DEV_API_URL)
@@ -214,7 +227,9 @@ clean: ## 清理构建产物
 
 generate-api: ## 生成 OpenAPI 类型（前端用）
 	@echo "Generating OpenAPI types..."
-	cd web && pnpm run generate-api
+	@api_port=8080; \
+	if [ -f .dev/dingtalk.env ]; then . ./.dev/dingtalk.env; api_port="$${SKILLHUB_DEV_API_PORT:-$${SERVER_PORT:-8080}}"; fi; \
+	cd web && SKILLHUB_DEV_API_PORT="$$api_port" pnpm run generate-api
 
 web-install: ## 安装前端依赖
 	cd web && pnpm install
@@ -237,7 +252,11 @@ web-install-ci: ## 以 CI 方式安装前端依赖
 	cd web && CI=true pnpm install --frozen-lockfile
 
 dev-web: ## 启动前端开发服务器
-	cd web && pnpm run dev
+	@web_env=''; \
+	if [ -f .dev/dingtalk.env ]; then \
+		web_env="$$(grep -E '^SKILLHUB_DEV_API_PORT=' .dev/dingtalk.env | tail -n 1)"; \
+	fi; \
+	cd web && /bin/sh -lc "$${web_env} pnpm run dev"
 
 build-frontend: web-deps ## 构建前端
 	cd web && pnpm run build

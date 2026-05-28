@@ -16,6 +16,16 @@ data:
   # local: 本地存储（默认）, s3: S3/OSS 对象存储
   skillhub-storage-provider: local
 
+  # S3/OSS 存储配置（可选）
+  skillhub-storage-s3-endpoint: ""
+  skillhub-storage-s3-public-endpoint: ""
+  skillhub-storage-s3-bucket: skillhub
+  skillhub-storage-s3-region: "us-east-1"
+  skillhub-storage-s3-force-path-style: "false"
+  skillhub-storage-s3-disable-chunked-encoding: "false"
+  skillhub-storage-s3-auto-create-bucket: "false"
+  skillhub-storage-s3-presign-expiry: "PT10M"
+
   # 技能扫描器配置
   skill-scanner-enabled: "true"
   skill-scanner-url: http://skillhub-scanner:8000
@@ -30,7 +40,21 @@ data:
 
   # Session 配置
   # HTTP 环境设为 false，HTTPS 环境设为 true
-  session-cookie-secure: "false"
+  session-cookie-secure: "true"
+
+  # Public entrypoint seen by browsers/redirect flows.
+  # Must be reachable from users with HTTPS in production.
+  skillhub-public-base-url: ""
+
+  # DingTalk 企业网页应用（敏感项放 Secret）
+  skillhub-dingtalk-enabled: "false"
+  skillhub-dingtalk-client-id: ""
+  skillhub-dingtalk-default-corp-id: ""
+  skillhub-dingtalk-super-admin-union-ids: ""
+
+  skillhub-web-auth-mode: "standard"
+  skillhub-web-dingtalk-auth-enabled: "false"
+  skillhub-web-dingtalk-auto-login: "true"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
