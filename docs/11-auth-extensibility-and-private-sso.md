@@ -4,6 +4,8 @@
 
 在不影响当前开源版 OAuth 和本地账号登录能力的前提下，为未来私有仓库接入企业 SSO 预留稳定扩展点，并把代码差异控制在 provider 实现层和少量配置层。
 
+> **已实现参考**：钉钉企业网页应用作为首个完整的企业 IdP 实现（免登 + 浏览器 OAuth + 组织目录同步），部署手册见 [20-dingtalk-private-deployment.md](./20-dingtalk-private-deployment.md)。通用私有 SSO 仍通过 `session/bootstrap` 与 `direct/login` 兼容层接入。
+
 ## 2. 已确认约束
 
 - 私有 SSO 能提供稳定唯一 UID

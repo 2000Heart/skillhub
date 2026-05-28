@@ -197,6 +197,25 @@ docker compose --env-file .env.release -f compose.release.yml up -d
 - 如果要开放真实登录，再补充 `OAUTH2_GITHUB_CLIENT_ID` / `OAUTH2_GITHUB_CLIENT_SECRET`
 - 如果要启用密码重置验证码邮件，参见：`docs/19-smtp-password-reset-email-setup.md`
 
+### 7.1 钉钉企业网页应用（私有部署）
+
+以钉钉为主身份源时，在 `.env.release` 中配置（完整说明见 `docs/20-dingtalk-private-deployment.md`）：
+
+| 变量 | 说明 |
+|------|------|
+| `SKILLHUB_DINGTALK_ENABLED` | 启用钉钉身份提供方 |
+| `SKILLHUB_DINGTALK_CLIENT_ID` / `SKILLHUB_DINGTALK_CLIENT_SECRET` | 钉钉应用凭据 |
+| `SKILLHUB_DINGTALK_DEFAULT_CORP_ID` | 单企业 corpId（免登 `requestAuthCode` 需要） |
+| `SKILLHUB_DINGTALK_SUPER_ADMIN_UNION_IDS` | 首次登录即授予超级管理员的 unionId 列表 |
+| `SKILLHUB_DINGTALK_ORG_SYNC_STARTUP_ENABLED` | 无基线时启动全量组织同步 |
+| `SKILLHUB_DINGTALK_ORG_SYNC_FULL_CRON` | 定时全量同步 cron |
+| `SKILLHUB_WEB_AUTH_MODE` | 设为 `dingtalk` 时登录页以钉钉为主 |
+| `SKILLHUB_WEB_DINGTALK_AUTH_ENABLED` | 前端启用钉钉免登与 OAuth 按钮 |
+| `SKILLHUB_WEB_DINGTALK_CLIENT_ID` | 与后端 clientId 一致，供 `dd.requestAuthCode` |
+| `SKILLHUB_WEB_DINGTALK_DEFAULT_CORP_ID` | 与后端 default corpId 一致（URL 无 `corpid` 时使用） |
+
+`SKILLHUB_PUBLIC_BASE_URL` 必须为钉钉可访问的 HTTPS 域名，用于 OAuth 回调与设备码链接。
+
 ## 8 OIDC 登录配置
 
 SkillHub 复用 Spring Security OAuth2 Client 的 OIDC 支持。前端不需要单独

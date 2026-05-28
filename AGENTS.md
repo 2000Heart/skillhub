@@ -432,6 +432,7 @@ ClawHub CLI compatibility maps:
 ### Authentication
 
 - Web: OAuth2 (GitHub) + local password auth
+- Enterprise: DingTalk web-app login (optional; `skillhub.dingtalk.enabled`, see `docs/20-dingtalk-private-deployment.md`)
 - CLI: OAuth Device Flow (web authorization → CLI credentials)
 - Programmatic: API tokens (prefix-based secure hashing)
 - Session: Spring Session + Redis
@@ -582,6 +583,7 @@ rg "@EventListener" server/
 - **`01-system-architecture.md`** — System architecture, module structure, dependency rules
 - **`02-domain-model.md`** — Domain entities and relationships
 - **`03-authentication-design.md`** — OAuth2, CLI Device Flow, API tokens
+- **`20-dingtalk-private-deployment.md`** — DingTalk enterprise web-app login and org sync
 - **`04-search-architecture.md`** — Search SPI and implementations
 - **`05-business-flows.md`** — Business process flows
 - **`06-api-design.md`** — API contract specifications

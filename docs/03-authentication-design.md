@@ -283,6 +283,30 @@ Spring Security OAuth2 Client 原生支持多 Provider 并存，新增 Provider 
 2. `CustomOAuth2UserService` 中按 `registrationId` 分支处理用户属性映射
 3. 前端登录页增加对应按钮（通过 `/api/v1/auth/providers` 自动发现）
 
+### 3.7 DingTalk 企业网页应用认证
+
+钉钉作为**独立于 Spring OAuth2 Client** 的企业 IdP，通过 `skillhub-auth` 模块中的 `dingtalk` 包实现，默认关闭（`skillhub.dingtalk.enabled=false`）。
+
+两条登录路径最终都复用 `IdentityBindingService` 与统一 Session：
+
+| 路径 | 入口 | 适用场景 |
+|------|------|----------|
+| 工作台免登 | `POST /api/v1/auth/dingtalk/login` + `code`/`corpId` | 钉钉内 H5，`dd.requestAuthCode` |
+| 浏览器 OAuth | `GET /api/v1/auth/dingtalk/oauth/authorize` → callback | 非钉钉环境备用登录 |
+
+身份契约：
+
+- `provider_code = dingtalk`
+- `subject = unionId`（钉钉稳定 UID，禁止用可变字段）
+- 平台 `userId` 仍为字符串，与 OAuth/GitHub 路径一致
+
+权限与准入：
+
+- 可通过 `SKILLHUB_DINGTALK_SUPER_ADMIN_UNION_IDS` 在首次登录时授予 `SUPER_ADMIN`
+- 用户被平台封禁时，登录链路在建立 Session 前拒绝
+
+组织目录（可选）：启用后由 `DingTalkOrgSyncService` 将通讯录投影到 `org_*` 表，供管理端与权限 bootstrap 使用。部署与联调详见 [20-dingtalk-private-deployment.md](./20-dingtalk-private-deployment.md)。
+
 ## 4. 核心接口设计
 
 ```java

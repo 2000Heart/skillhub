@@ -71,6 +71,18 @@ or the Compose environment.
 | `make dev-server-restart`        | Restart backend after Java changes |
 | `make namespace-smoke`           | Run namespace workflow smoke test |
 | `make db-reset`                  | Reset database only              |
+| `make dingtalk-smoke`            | DingTalk auth endpoint smoke (needs backend + optional `.dev/dingtalk.env`) |
+
+### DingTalk local development
+
+For enterprise DingTalk login testing:
+
+1. Create `.dev/dingtalk.env` (gitignored) with `SKILLHUB_DINGTALK_*` and optional `SKILLHUB_DEV_API_PORT`.
+2. `make dev-server-restart` — the Makefile sources `.dev/dingtalk.env` when starting the backend.
+3. `make dingtalk-smoke` — verifies auth methods and DingTalk endpoints respond.
+4. `./scripts/ngrok-dingtalk-dev.sh` — exposes HTTPS and writes `SKILLHUB_PUBLIC_BASE_URL` into `.dev/dingtalk.env`.
+
+See `docs/20-dingtalk-private-deployment.md` for platform-side callback URLs and micro-app homepage configuration.
 
 ### Claude + Codex parallel workflow
 

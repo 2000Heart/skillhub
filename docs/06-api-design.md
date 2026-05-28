@@ -109,6 +109,9 @@ Public API 的可见性规则：
 | GET | `/api/v1/auth/methods` | 统一登录方式目录（密码/OAuth/direct/bootstrap 元数据） |
 | POST | `/api/v1/auth/direct/login` | 显式走直连认证 provider 的兼容登录入口（默认关闭） |
 | POST | `/api/v1/auth/session/bootstrap` | 显式尝试用外部被动会话换取 skillhub Session（默认关闭） |
+| POST | `/api/v1/auth/dingtalk/login` | 钉钉工作台免登（`code` + `corpId`，需 `skillhub.dingtalk.enabled=true`） |
+| GET | `/api/v1/auth/dingtalk/oauth/authorize` | 钉钉浏览器 OAuth 发起（302 到钉钉授权页） |
+| GET | `/api/v1/auth/dingtalk/oauth/callback` | 钉钉浏览器 OAuth 回调（建立 Session 后重定向前端） |
 
 `/api/v1/auth/providers` 响应示例：
 
@@ -132,6 +135,18 @@ Public API 的可见性规则：
 - `OAUTH_REDIRECT`：OAuth 跳转登录
 - `DIRECT_PASSWORD`：默认关闭的直连认证兼容入口
 - `SESSION_BOOTSTRAP`：默认关闭的被动会话引导入口
+- `OAUTH_REDIRECT`（钉钉）：`oauth-dingtalk`，`actionUrl` 指向 `/api/v1/auth/dingtalk/oauth/authorize`（仅 `skillhub.dingtalk.enabled=true` 时出现）
+
+`POST /api/v1/auth/dingtalk/login` 请求示例：
+
+```json
+{
+  "code": "authCodeFromDdRequestAuthCode",
+  "corpId": "dingCorpId"
+}
+```
+
+成功时返回与 `/api/v1/auth/me` 相同的 `AuthMeResponse` 结构，并建立标准 Session。
 
 示例：
 
@@ -323,6 +338,22 @@ Admin API 按最小权限拆分，不再统一要求 SUPER_ADMIN：
 | POST | `/api/v1/admin/users/{id}/approve` | 审批待准入用户 |
 | POST | `/api/v1/admin/users/{id}/disable` | 封禁用户 |
 | POST | `/api/v1/admin/users/{id}/enable` | 解封用户 |
+
+### 钉钉组织（需 USER_ADMIN / SUPER_ADMIN，且 `skillhub.dingtalk.enabled=true`）
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/v1/admin/dingtalk/departments` | 组织部门树（本地投影） |
+| GET | `/api/v1/admin/dingtalk/users` | 组织用户列表 |
+| GET | `/api/v1/admin/dingtalk/sync/status` | 同步状态与最近运行结果 |
+| POST | `/api/v1/admin/dingtalk/sync/full` | 手动触发全量同步 |
+| POST | `/api/v1/admin/dingtalk/permissions/bootstrap` | 批量初始化未赋权用户的平台角色（`dryRun` 查询参数） |
+
+钉钉事件回调（由钉钉服务器调用，非管理端 Session）：
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | `/api/v1/dingtalk/events/callback` | 组织/用户变更增量同步 |
 
 ### 审计（需 AUDITOR / SUPER_ADMIN）
 

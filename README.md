@@ -39,6 +39,7 @@ firewall, with the same polish you'd expect from a public registry.
 
 - 📖 **[User Guide](https://iflytek.github.io/skillhub/)** — Skill publishing, search, CLI usage and other user guides
 - 🛠️ **[Developer Docs](https://zread.ai/iflytek/skillhub)** — Architecture, API reference, local development, deployment and operations
+- 🏢 **[DingTalk Private Deployment](./docs/20-dingtalk-private-deployment.md)** — Enterprise DingTalk web-app login and org directory sync
 
 ## Highlights
 
