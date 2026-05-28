@@ -334,7 +334,8 @@
     "viewReports": "View skill reports",
     "previewMore": "...",
     "previewMoreLabel": "View All",
-    "userId": "User ID"
+    "userId": "User ID",
+    "department": "Department"
   },
   "mySkills": {
     "title": "My Skills",
@@ -567,6 +568,7 @@
     "colUserId": "User ID",
     "copyUserId": "Copy user ID for {{username}}",
     "colEmail": "Email",
+    "colDepartment": "Department",
     "colStatus": "Status",
     "colRole": "Role",
     "colCreatedAt": "Created At",
@@ -701,6 +703,7 @@
     "subtitle": "Manage your display name and personal information.",
     "displayName": "Display Name",
     "email": "Email",
+    "department": "Department",
     "resetPassword": "Reset Password",
     "edit": "Edit",
     "save": "Save",

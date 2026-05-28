@@ -12,6 +12,7 @@ import { cn } from '@/shared/lib/utils'
 interface User {
   displayName: string
   avatarUrl?: string
+  department?: string
   platformRoles?: string[]
   oauthProvider?: string
 }
@@ -131,6 +132,11 @@ export function UserMenu({ user, triggerClassName }: UserMenuProps) {
         <span className="text-sm font-medium text-inherit">
           {user.displayName}
         </span>
+        {user.department ? (
+          <span className="text-xs text-muted-foreground hidden sm:inline">
+            {user.department}
+          </span>
+        ) : null}
       </button>
       {open ? (
         <div
@@ -181,6 +187,21 @@ export function UserMenu({ user, triggerClassName }: UserMenuProps) {
             {isUserAdmin ? (
               <Link to="/admin/users" className={menuItemClassName} onClick={closeMenu}>
                 {t('user.menu.users')}
+              </Link>
+            ) : null}
+            {isUserAdmin ? (
+              <Link to="/admin/org/structure" className={menuItemClassName} onClick={closeMenu}>
+                {t('user.menu.orgStructure', '组织架构')}
+              </Link>
+            ) : null}
+            {isUserAdmin ? (
+              <Link to="/admin/org/users" className={menuItemClassName} onClick={closeMenu}>
+                {t('user.menu.orgUsers', '组织用户')}
+              </Link>
+            ) : null}
+            {isUserAdmin ? (
+              <Link to="/admin/org/sync" className={menuItemClassName} onClick={closeMenu}>
+                {t('user.menu.orgSync', '组织同步')}
               </Link>
             ) : null}
             {isSuperAdmin ? (

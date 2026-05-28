@@ -9,5 +9,6 @@ export function useAuthMethods(returnTo?: string) {
   return useQuery<AuthMethod[]>({
     queryKey: ['auth', 'methods', returnTo ?? ''],
     queryFn: () => authApi.getMethods(returnTo),
+    meta: { skipGlobalErrorHandler: true },
   })
 }

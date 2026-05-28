@@ -24,6 +24,7 @@ vi.mock('lucide-react', () => ({
 
 vi.mock('@/api/client', () => ({
   getDirectAuthRuntimeConfig: () => ({ enabled: false }),
+  getDingTalkRuntimeConfig: () => ({ enabled: false, autoLogin: true }),
 }))
 
 vi.mock('@/features/auth/login-button', () => ({
@@ -44,6 +45,10 @@ vi.mock('@/features/auth/use-password-login', () => ({
     isPending: false,
     error: null,
   }),
+}))
+
+vi.mock('@/features/auth/dingtalk/dingtalk-login-panel', () => ({
+  DingTalkLoginPanel: () => null,
 }))
 
 vi.mock('@/shared/ui/button', () => ({

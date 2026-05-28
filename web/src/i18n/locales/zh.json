@@ -334,7 +334,8 @@
     "viewReports": "查看技能举报",
     "previewMore": "...",
     "previewMoreLabel": "查看全部",
-    "userId": "用户 ID"
+    "userId": "用户 ID",
+    "department": "所属部门"
   },
   "mySkills": {
     "title": "我的技能",
@@ -567,6 +568,7 @@
     "colUserId": "用户 ID",
     "copyUserId": "复制 {{username}} 的用户 ID",
     "colEmail": "邮箱",
+    "colDepartment": "所属部门",
     "colStatus": "状态",
     "colRole": "角色",
     "colCreatedAt": "创建时间",
@@ -701,6 +703,7 @@
     "subtitle": "管理你的昵称和个人信息。",
     "displayName": "昵称",
     "email": "邮箱",
+    "department": "所属部门",
     "resetPassword": "重置密码",
     "edit": "编辑",
     "save": "保存",

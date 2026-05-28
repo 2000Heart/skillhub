@@ -5,5 +5,10 @@ window.__SKILLHUB_RUNTIME_CONFIG__ = {
   authDirectProvider: "${SKILLHUB_WEB_AUTH_DIRECT_PROVIDER}",
   authSessionBootstrapEnabled: "${SKILLHUB_WEB_AUTH_SESSION_BOOTSTRAP_ENABLED}",
   authSessionBootstrapProvider: "${SKILLHUB_WEB_AUTH_SESSION_BOOTSTRAP_PROVIDER}",
-  authSessionBootstrapAuto: "${SKILLHUB_WEB_AUTH_SESSION_BOOTSTRAP_AUTO}"
+  authSessionBootstrapAuto: "${SKILLHUB_WEB_AUTH_SESSION_BOOTSTRAP_AUTO}",
+  authMode: "${SKILLHUB_WEB_AUTH_MODE}",
+  dingtalkAuthEnabled: "${SKILLHUB_WEB_DINGTALK_AUTH_ENABLED}",
+  dingtalkClientId: "${SKILLHUB_WEB_DINGTALK_CLIENT_ID}",
+  dingtalkAutoLogin: "${SKILLHUB_WEB_DINGTALK_AUTO_LOGIN}",
+  dingtalkDefaultCorpId: "${SKILLHUB_WEB_DINGTALK_DEFAULT_CORP_ID}"
 };

@@ -15,6 +15,7 @@ vi.mock('react-i18next', async () => {
 })
 
 vi.mock('@/api/client', () => ({
+  getDingTalkRuntimeConfig: vi.fn(() => ({ enabled: false, autoLogin: false })),
   authApi: {
     requestPasswordReset: vi.fn(),
     confirmPasswordReset: vi.fn(),

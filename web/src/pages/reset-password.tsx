@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { FormEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { authApi } from '@/api/client'
+import { authApi, getDingTalkRuntimeConfig } from '@/api/client'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Input } from '@/shared/ui/input'
@@ -11,6 +11,7 @@ import { Input } from '@/shared/ui/input'
  */
 export function ResetPasswordPage() {
   const { t } = useTranslation()
+  const dingTalkRuntime = getDingTalkRuntimeConfig()
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('')
   const [newPassword, setNewPassword] = useState('')
@@ -21,6 +22,29 @@ export function ResetPasswordPage() {
   const [codeSentMessage, setCodeSentMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const emailPattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
+
+  if (dingTalkRuntime.enabled) {
+    return (
+      <div className="mx-auto flex min-h-[70vh] max-w-2xl items-center justify-center">
+        <Card className="w-full border-slate-200 bg-white/95 shadow-xl">
+          <CardHeader className="space-y-3 text-center">
+            <CardTitle>{t('resetPassword.title')}</CardTitle>
+            <CardDescription>当前已启用钉钉免登模式，不支持本地密码重置。</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 text-center">
+            <p className="text-sm text-muted-foreground">请在钉钉中完成身份认证。</p>
+            <Link
+              to="/login"
+              search={{ returnTo: '' }}
+              className="block text-center font-medium text-primary hover:underline"
+            >
+              返回登录
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   async function handleSendCode() {
     const normalizedEmail = email.trim().toLowerCase()

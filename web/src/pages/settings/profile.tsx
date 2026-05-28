@@ -27,11 +27,12 @@ const FIELD_VALIDATORS: Record<string, FieldValidator> = {
 /** Map field key to the profile data property holding its current value. */
 function getFieldValue(
   field: string,
-  profile: { displayName: string; avatarUrl: string | null; email: string | null },
+  profile: { displayName: string; avatarUrl: string | null; email: string | null; department: string | null },
 ): string {
   switch (field) {
     case 'displayName': return profile.displayName ?? ''
     case 'email': return profile.email ?? ''
+    case 'department': return profile.department ?? ''
     default: return ''
   }
 }
@@ -58,11 +59,13 @@ export function ProfileSettingsPage() {
   const effectiveDisplayName = profileData?.displayName ?? user?.displayName ?? ''
   const effectiveAvatarUrl = profileData?.avatarUrl ?? user?.avatarUrl ?? null
   const effectiveEmail = profileData?.email ?? user?.email ?? ''
+  const effectiveDepartment = profileData?.department ?? user?.department ?? ''
 
   const effectiveProfile = {
     displayName: effectiveDisplayName,
     avatarUrl: effectiveAvatarUrl,
     email: effectiveEmail,
+    department: effectiveDepartment,
   }
 
   const hasEditableFields = Object.values(fieldPolicies).some((p) => p.editable)
@@ -210,6 +213,10 @@ export function ProfileSettingsPage() {
           <div className="space-y-2">
             <label className="text-sm font-medium">{t('profile.userId')}</label>
             <p className="text-sm text-muted-foreground">{user?.userId || '-'}</p>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{t('profile.department')}</label>
+            <p className="text-sm text-muted-foreground">{effectiveDepartment || '-'}</p>
           </div>
 
           <form className="space-y-4" onSubmit={handleSubmit}>

@@ -136,6 +136,21 @@ const AdminLabelsPage = createRoleProtectedRouteComponent(
   'AdminLabelsPage',
   ['SUPER_ADMIN'],
 )
+const OrgStructurePage = createRoleProtectedRouteComponent(
+  () => import('@/pages/admin/org-structure'),
+  'OrgStructurePage',
+  ['USER_ADMIN', 'SUPER_ADMIN'],
+)
+const OrgUsersPage = createRoleProtectedRouteComponent(
+  () => import('@/pages/admin/org-users'),
+  'OrgUsersPage',
+  ['USER_ADMIN', 'SUPER_ADMIN'],
+)
+const OrgSyncCenterPage = createRoleProtectedRouteComponent(
+  () => import('@/pages/admin/org-sync-center'),
+  'OrgSyncCenterPage',
+  ['USER_ADMIN', 'SUPER_ADMIN'],
+)
 
 function DefaultNotFound() {
   return (
@@ -424,6 +439,27 @@ const adminLabelsRoute = createRoute({
   component: AdminLabelsPage,
 })
 
+const adminOrgStructureRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'admin/org/structure',
+  beforeLoad: requireAuth,
+  component: OrgStructurePage,
+})
+
+const adminOrgUsersRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'admin/org/users',
+  beforeLoad: requireAuth,
+  component: OrgUsersPage,
+})
+
+const adminOrgSyncRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: 'admin/org/sync',
+  beforeLoad: requireAuth,
+  component: OrgSyncCenterPage,
+})
+
 const routeTree = rootRoute.addChildren([
   landingRoute,
   skillsRoute,
@@ -460,6 +496,9 @@ const routeTree = rootRoute.addChildren([
   adminUsersRoute,
   adminAuditLogRoute,
   adminLabelsRoute,
+  adminOrgStructureRoute,
+  adminOrgUsersRoute,
+  adminOrgSyncRoute,
 ])
 
 export const router = createRouter({

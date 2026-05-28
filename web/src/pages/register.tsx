@@ -1,7 +1,7 @@
 import { Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ApiError } from '@/api/client'
+import { ApiError, getDingTalkRuntimeConfig } from '@/api/client'
 import { LoginButton } from '@/features/auth/login-button'
 import { useLocalRegister } from '@/features/auth/use-local-auth'
 import { Button } from '@/shared/ui/button'
@@ -62,6 +62,32 @@ export function RegisterPage() {
   const [formError, setFormError] = useState<string | null>(null)
 
   const returnTo = search.returnTo && search.returnTo.startsWith('/') ? search.returnTo : '/dashboard'
+
+  const dingTalkRuntime = getDingTalkRuntimeConfig()
+  if (dingTalkRuntime.enabled) {
+    return (
+      <div className="flex min-h-[70vh] items-center justify-center p-4">
+        <Card className="w-full max-w-md p-6 space-y-4 text-center">
+          <CardHeader className="space-y-2">
+            <CardTitle className="text-2xl">{t('register.title')}</CardTitle>
+            <CardDescription>当前已启用钉钉免登模式，不支持本地注册。</CardDescription>
+          </CardHeader>
+          <Button
+            className="w-full"
+            type="button"
+            onClick={() => {
+              void navigate({
+                to: '/login',
+                search: { returnTo },
+              })
+            }}
+          >
+            返回登录
+          </Button>
+        </Card>
+      </div>
+    )
+  }
 
   function validateUsername(value: string) {
     const trimmed = value.trim()

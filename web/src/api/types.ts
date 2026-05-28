@@ -7,6 +7,7 @@ export type User = Omit<components['schemas']['AuthMeResponse'], 'userId' | 'dis
   avatarUrl?: string
   oauthProvider?: string
   platformRoles: string[]
+  department?: string
 }
 
 export type OAuthProvider = Omit<components['schemas']['AuthProviderResponse'], 'id' | 'name' | 'authorizationUrl'> & {
@@ -54,6 +55,11 @@ export interface LocalLoginRequest {
 
 export interface LocalRegisterRequest extends LocalLoginRequest {
   email: string
+}
+
+export interface DingTalkLoginRequest {
+  code: string
+  corpId?: string
 }
 
 export interface ChangePasswordRequest {
@@ -465,9 +471,42 @@ export interface AdminUser {
   userId: string
   username: string
   email?: string
+  department?: string
   platformRoles: string[]
   status: string
   createdAt: string
+}
+
+export interface OrgDepartmentItem {
+  deptId: number
+  parentDeptId?: number
+  name: string
+  order?: number
+  lastSyncAt?: string
+  deleted: boolean
+}
+
+export interface OrgUserItem {
+  userId: string
+  unionId?: string
+  name: string
+  title?: string
+  mobile?: string
+  email?: string
+  active: boolean
+  primaryDeptId?: number
+  lastSyncAt?: string
+  permissionSource?: 'INITIAL_FROM_DINGTALK' | 'MANUAL'
+  permissionInitializedAt?: string
+  accountStatus?: string
+  dingtalkRoles: string[]
+}
+
+export interface OrgSyncStatus {
+  phase: string
+  success: boolean
+  lastRunAt?: string
+  lastError?: string
 }
 
 export interface AuditLogItem {

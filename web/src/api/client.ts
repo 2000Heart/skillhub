@@ -41,6 +41,10 @@ import type {
   LabelDefinition,
   LabelItem,
   BatchMemberResponse,
+  DingTalkLoginRequest,
+  OrgDepartmentItem,
+  OrgSyncStatus,
+  OrgUserItem,
 } from './types'
 import { ApiError } from '@/shared/lib/api-error'
 import i18n from '@/i18n/config'
@@ -63,6 +67,11 @@ type RuntimeConfig = {
   authSessionBootstrapEnabled?: string
   authSessionBootstrapProvider?: string
   authSessionBootstrapAuto?: string
+  authMode?: string
+  dingtalkAuthEnabled?: string
+  dingtalkClientId?: string
+  dingtalkAutoLogin?: string
+  dingtalkDefaultCorpId?: string
 }
 
 declare global {
@@ -160,6 +169,26 @@ export function getSessionBootstrapRuntimeConfig(): SessionBootstrapRuntimeConfi
     enabled: parseBooleanFlag(config.authSessionBootstrapEnabled) && !!provider,
     provider: provider || undefined,
     auto: parseBooleanFlag(config.authSessionBootstrapAuto),
+  }
+}
+
+export type DingTalkRuntimeConfig = {
+  enabled: boolean
+  clientId?: string
+  autoLogin: boolean
+  defaultCorpId?: string
+}
+
+export function getDingTalkRuntimeConfig(): DingTalkRuntimeConfig {
+  const config = getRuntimeConfig()
+  const authMode = config.authMode?.trim() || 'standard'
+  const clientId = config.dingtalkClientId?.trim()
+  const defaultCorpId = config.dingtalkDefaultCorpId?.trim()
+  return {
+    enabled: authMode === 'dingtalk' && parseBooleanFlag(config.dingtalkAuthEnabled) && !!clientId,
+    clientId: clientId || undefined,
+    autoLogin: parseBooleanFlag(config.dingtalkAutoLogin),
+    defaultCorpId: defaultCorpId || undefined,
   }
 }
 
@@ -287,9 +316,11 @@ export async function getCurrentUser(): Promise<User | null> {
       userId: user.userId ?? '',
       displayName: user.displayName ?? '',
       platformRoles: user.platformRoles ?? [],
+      department: user.department ?? undefined,
     }
   } catch (error) {
-    if (error instanceof ApiError && error.status === 401) {
+    // 401 = not signed in; 403 often means the dev proxy hit a non-SkillHub service (e.g. Jenkins on 8080).
+    if (error instanceof ApiError && (error.status === 401 || error.status === 403)) {
       return null
     }
     throw error
@@ -394,6 +425,16 @@ export const authApi = {
         'Content-Type': 'application/json',
       }),
       body: JSON.stringify({ provider }),
+    })
+  },
+
+  async dingtalkLogin(request: DingTalkLoginRequest): Promise<User> {
+    return fetchJson<User>('/api/v1/auth/dingtalk/login', {
+      method: 'POST',
+      headers: await ensureCsrfHeaders({
+        'Content-Type': 'application/json',
+      }),
+      body: JSON.stringify(request),
     })
   },
 
@@ -1088,6 +1129,7 @@ export const profileApi = {
     displayName: string
     avatarUrl: string | null
     email: string | null
+    department: string | null
     pendingChanges: {
       status: string
       changes: Record<string, string>
@@ -1125,6 +1167,7 @@ export const adminApi = {
         id: string
         username: string
         email?: string
+        department?: string
         platformRoles?: string[]
         status: string
         createdAt: string
@@ -1143,6 +1186,7 @@ export const adminApi = {
           userId: user.id,
           username: user.username,
           email: user.email,
+          department: user.department,
           platformRoles: user.platformRoles ?? [],
           status: user.status,
           createdAt: user.createdAt,
@@ -1290,6 +1334,33 @@ export const adminApi = {
       method: 'POST',
       headers: getCsrfHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ comment }),
+    })
+  },
+
+  async listOrgDepartments() {
+    return fetchJson<OrgDepartmentItem[]>('/api/v1/admin/dingtalk/departments')
+  },
+
+  async listOrgUsers() {
+    return fetchJson<OrgUserItem[]>('/api/v1/admin/dingtalk/users')
+  },
+
+  async getOrgSyncStatus() {
+    return fetchJson<OrgSyncStatus>('/api/v1/admin/dingtalk/sync/status')
+  },
+
+  async runOrgFullSync() {
+    await fetchJson<void>('/api/v1/admin/dingtalk/sync/full', {
+      method: 'POST',
+      headers: getCsrfHeaders(),
+    })
+  },
+
+  async bootstrapOrgPermissions(dryRun = false) {
+    const params = new URLSearchParams({ dryRun: String(dryRun) })
+    return fetchJson<number>(`/api/v1/admin/dingtalk/permissions/bootstrap?${params.toString()}`, {
+      method: 'POST',
+      headers: getCsrfHeaders(),
     })
   },
 }

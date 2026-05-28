@@ -39,6 +39,7 @@ import {
   useUpdateUserRole,
 } from '@/features/admin/use-admin-users'
 import type { AdminUser } from '@/features/admin/use-admin-users'
+import { getDingTalkRuntimeConfig } from '@/api/client'
 
 /**
  * Admin user management page that combines search, status filtering, approval,
@@ -46,6 +47,8 @@ import type { AdminUser } from '@/features/admin/use-admin-users'
  */
 export function AdminUsersPage() {
   const { t, i18n } = useTranslation()
+  const dingTalkRuntime = getDingTalkRuntimeConfig()
+  const localPasswordAllowed = !dingTalkRuntime.enabled
   const allStatusFilterValue = '__all_statuses__'
   const roleOptions = [
     { value: 'USER', label: t('adminUsers.roleUser') },
@@ -216,6 +219,7 @@ export function AdminUsersPage() {
                   <TableHead>{t('adminUsers.colUsername')}</TableHead>
                   <TableHead>{t('adminUsers.colUserId')}</TableHead>
                   <TableHead>{t('adminUsers.colEmail')}</TableHead>
+                  <TableHead>{t('adminUsers.colDepartment')}</TableHead>
                   <TableHead>{t('adminUsers.colStatus')}</TableHead>
                   <TableHead>{t('adminUsers.colRole')}</TableHead>
                   <TableHead>{t('adminUsers.colCreatedAt')}</TableHead>
@@ -233,6 +237,7 @@ export function AdminUsersPage() {
                       </div>
                     </TableCell>
                     <TableCell>{user.email || '-'}</TableCell>
+                    <TableCell>{user.department || '-'}</TableCell>
                     <TableCell>
                       <span
                         className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
@@ -283,13 +288,15 @@ export function AdminUsersPage() {
                             {t('adminUsers.enable')}
                           </Button>
                         )}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleTriggerPasswordReset(user)}
-                        >
-                          {t('adminUsers.resetPassword')}
-                        </Button>
+                        {localPasswordAllowed ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleTriggerPasswordReset(user)}
+                          >
+                            {t('adminUsers.resetPassword')}
+                          </Button>
+                        ) : null}
                       </div>
                     </TableCell>
                   </TableRow>

@@ -7,6 +7,7 @@ import { UserMenu } from '@/shared/components/user-menu'
 import { NotificationBell } from '@/features/notification/notification-bell'
 import { getAppHeaderClassName } from './layout-header-style'
 import { getAppMainContentLayout, resolveAppMainContentPathname } from './layout-main-content'
+import { DingTalkInAppAuthGate } from '@/features/auth/dingtalk/dingtalk-inapp-auth-gate'
 
 /**
  * Application shell shared by all routed pages.
@@ -61,6 +62,7 @@ export function Layout() {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-x-clip" style={{ background: 'var(--bg-page, hsl(var(--background)))' }}>
+      <DingTalkInAppAuthGate />
       {/* Decorative gradient orb */}
       <div
         className="absolute top-0 right-0 w-[600px] h-[500px] rounded-full opacity-90 pointer-events-none z-0"

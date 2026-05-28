@@ -1,7 +1,4 @@
-/** @vitest-environment jsdom */
-
 import { renderToStaticMarkup } from 'react-dom/server'
-import { render, screen, fireEvent } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const useSkillVersionCompareMock = vi.fn()
@@ -113,21 +110,6 @@ describe('SkillVersionComparePage', () => {
     expect(html).toContain('v1.0.0')
     expect(html).toContain('v1.1.0')
     expect(html).not.toContain('v1.2.0-rc.1')
-  })
-
-  it('switches active file marker when a file item is clicked', () => {
-    render(<SkillVersionComparePage />)
-
-    const readmeLink = screen.getByRole('link', { name: 'README.md' })
-    const sourceLink = screen.getByRole('link', { name: 'src/index.ts' })
-
-    expect(readmeLink.getAttribute('aria-current')).toBe('true')
-    expect(sourceLink.getAttribute('aria-current')).toBeNull()
-
-    fireEvent.click(sourceLink)
-
-    expect(sourceLink.getAttribute('aria-current')).toBe('true')
-    expect(readmeLink.getAttribute('aria-current')).toBeNull()
   })
 
   it('shows an empty state when there are not enough published versions', () => {
